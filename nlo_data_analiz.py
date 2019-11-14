@@ -39,6 +39,7 @@ def dict_sort(my_dict):
 df = pd.read_csv('./scrubbed.csv', escapechar='`', low_memory=False)
 
 df = df.replace({'shape':None}, 'unknown')
+'''статистика по странам
 country_label_count = pd.value_counts(df['country'].values) # Получить из таблицы список всех меток country с их количеством
 print('labels:', country_label_count)
 for label in list(country_label_count.keys()):
@@ -60,4 +61,20 @@ plt.bar(np.arange(TOP_COUNTRY), country_count_values, color=getColors(TOP_COUNTR
 plt.xticks(np.arange(TOP_COUNTRY), country_count_keys, rotation=0, fontsize=12)
 plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
 plt.ylabel('Количество наблюдений', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.show()
+'''
+
+'''статистика по времени года'''
+MONTH_COUNT = [0,0,0,0,0,0,0,0,0,0,0,0]
+MONTH_LABEL = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь' ,'Октябрь' ,'Ноябрь' ,'Декабрь']
+for i in df['datetime']:
+    m,d,y_t = i.split('/')
+    MONTH_COUNT[int(m)-1] = MONTH_COUNT[int(m)-1] + 1
+
+plt.bar(np.arange(12), MONTH_COUNT, color=getColors(12))
+plt.xticks(np.arange(12), MONTH_LABEL, rotation=90, fontsize=PLOT_LABEL_FONT_SIZE)
+plt.ylabel('частота появлений', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
+plt.title('Частота появления объектов по месяцам', fontsize=PLOT_LABEL_FONT_SIZE)
 plt.show()
