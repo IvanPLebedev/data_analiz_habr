@@ -7,8 +7,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from yandex_translate import YandexTranslate
 from yandex_translate import YandexTranslateException
 
-import auxiliary_function as myfuncs
-
 YANDEX_API_KEY = "trnsl.1.1.20191112T191006Z.7bd4f3ab17167843.ccf95966a99dd856b4823bc8d5a32af0d01630ee"
 PLOT_LABEL_FONT_SIZE = 14
 try:
@@ -39,14 +37,27 @@ def dict_sort(my_dict):
     return (keys,values)
 
 df = pd.read_csv('./scrubbed.csv', escapechar='`', low_memory=False)
+
 df = df.replace({'shape':None}, 'unknown')
 country_label_count = pd.value_counts(df['country'].values) # Получить из таблицы список всех меток country с их количеством
+print('labels:', country_label_count)
 for label in list(country_label_count.keys()):
-    c = pycountry.countries.get(alpha_2=str(label).upper()) # Перевести код страны в полное название
-    t = translate(c.name, translate_obj) # Перевести название страны на русский язык
-    df = df.replace({'country':str(label)}, t)
-    
+    if len(label) < 3:
+        c = pycountry.countries.get(alpha_2=str(label).upper()) # Перевести код страны в полное название
+        t = translate(c.name, translate_obj) # Перевести название страны на русский язык
+        df = df.replace({'country':str(label)}, t)
+
 shapes_label_count = pd.value_counts(df['shape'].values)
 for label in list(shapes_label_count.keys()):
     t = translate(str(label), translate_obj) # Перевести название формы объекта на русский язык
     df = df.replace({'shape':str(label)}, t)
+
+country_count = pd.value_counts(df['country'].values, sort=True)
+country_count_keys, country_count_values = dict_sort(dict(country_count))
+TOP_COUNTRY = len(country_count_keys)
+plt.title('Страны, где больше всего наблюдений.', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.bar(np.arange(TOP_COUNTRY), country_count_values, color=getColors(TOP_COUNTRY))
+plt.xticks(np.arange(TOP_COUNTRY), country_count_keys, rotation=0, fontsize=12)
+plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
+plt.ylabel('Количество наблюдений', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.show()
