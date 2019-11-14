@@ -14,11 +14,13 @@ try:
 except YandexTranslateException:
     translate_obj = None
 
-def translate(string, translator_obj = None):
-    if translator_obj == None:
+
+def translate(string, translator_obj=None):
+    if translator_obj is None:
         return string
     t = translate_obj.translate(string, 'en-ru')
     return t['text'][0]
+
 
 def getColors(n):
     COLORS = []
@@ -27,65 +29,83 @@ def getColors(n):
         COLORS.append(cm(i))
     return COLORS
 
+
 def dict_sort(my_dict):
     keys = []
     values = []
-    my_dict = sorted(my_dict.items(), key=lambda x:x[1], reverse=True)
+    my_dict = sorted(my_dict.items(), key=lambda x: x[1], reverse=True)
     for k, v in my_dict:
         keys.append(k)
         values.append(v)
-    return (keys,values)
+    return (keys, values)
 
 df = pd.read_csv('./scrubbed.csv', escapechar='`', low_memory=False)
+df = df.replace({'shape': None}, 'unknown')
 
-df = df.replace({'shape':None}, 'unknown')
 '''статистика по странам
-country_label_count = pd.value_counts(df['country'].values) # Получить из таблицы список всех меток country с их количеством
+# Получить из таблицы список всех меток country с их количеством
+country_label_count = pd.value_counts(df['country'].values)
 print('labels:', country_label_count)
 for label in list(country_label_count.keys()):
     if len(label) < 3:
-        c = pycountry.countries.get(alpha_2=str(label).upper()) # Перевести код страны в полное название
-        t = translate(c.name, translate_obj) # Перевести название страны на русский язык
-        df = df.replace({'country':str(label)}, t)
+        # Перевести код страны в полное название
+        c = pycountry.countries.get(alpha_2=str(label).upper())
+        # Перевести название страны на русский язык
+        t = translate(c.name, translate_obj)
+        df = df.replace({'country': str(label)}, t)
 
 shapes_label_count = pd.value_counts(df['shape'].values)
 for label in list(shapes_label_count.keys()):
-    t = translate(str(label), translate_obj) # Перевести название формы объекта на русский язык
-    df = df.replace({'shape':str(label)}, t)
+    # Перевести название формы объекта на русский язык
+    t = translate(str(label), translate_obj)
+    df = df.replace({'shape': str(label)}, t)
 
 country_count = pd.value_counts(df['country'].values, sort=True)
 country_count_keys, country_count_values = dict_sort(dict(country_count))
 TOP_COUNTRY = len(country_count_keys)
-plt.title('Страны, где больше всего наблюдений.', fontsize=PLOT_LABEL_FONT_SIZE)
-plt.bar(np.arange(TOP_COUNTRY), country_count_values, color=getColors(TOP_COUNTRY))
-plt.xticks(np.arange(TOP_COUNTRY), country_count_keys, rotation=0, fontsize=12)
+plt.title('Страны, где больше всего наблюдений.',
+          fontsize=PLOT_LABEL_FONT_SIZE)
+plt.bar(np.arange(TOP_COUNTRY), country_count_values,
+        color=getColors(TOP_COUNTRY))
+plt.xticks(np.arange(TOP_COUNTRY), country_count_keys, rotation=0,
+           fontsize=12)
 plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
 plt.ylabel('Количество наблюдений', fontsize=PLOT_LABEL_FONT_SIZE)
 plt.show()
+
 '''
 
 '''статистика по времени года
-MONTH_COUNT = [0,0,0,0,0,0,0,0,0,0,0,0]
-MONTH_LABEL = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-    'Июль', 'Август', 'Сентябрь' ,'Октябрь' ,'Ноябрь' ,'Декабрь']
+MONTH_COUNT = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+MONTH_LABEL = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ]
 for i in df['datetime']:
-    m,d,y_t = i.split('/')
+    m, d, y_t = i.split('/')
     MONTH_COUNT[int(m)-1] = MONTH_COUNT[int(m)-1] + 1
 
 plt.bar(np.arange(12), MONTH_COUNT, color=getColors(12))
-plt.xticks(np.arange(12), MONTH_LABEL, rotation=90, fontsize=PLOT_LABEL_FONT_SIZE)
+plt.xticks(np.arange(12), MONTH_LABEL, rotation=90,
+           fontsize=PLOT_LABEL_FONT_SIZE)
 plt.ylabel('частота появлений', fontsize=PLOT_LABEL_FONT_SIZE)
 plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
-plt.title('Частота появления объектов по месяцам', fontsize=PLOT_LABEL_FONT_SIZE)
-plt.show()'''
+plt.title('Частота появления объектов по месяцам',
+          fontsize=PLOT_LABEL_FONT_SIZE)
+plt.show()
 
-'''статистика по форме обьектов НЛО
+'''
+
+'''статистика по форме обьектов НЛО'''
 shapes_type_count = pd.value_counts(df['shape'].values)
-shapes_type_count_keys, shapes_type_count_values = dict_sort(dict(shapes_type_count))
+shapes_type_count_keys, shapes_type_count_values = dict_sort(dict(
+    shapes_type_count))
 object_count = len(shapes_type_count_keys)
 plt.title('типы обьектов', fontsize=PLOT_LABEL_FONT_SIZE)
-plt.bar(np.arange(object_count), shapes_type_count_values, color=getColors(object_count))
-plt.xticks(np.arange(object_count),shapes_type_count_keys,rotation=90,fontsize=PLOT_LABEL_FONT_SIZE)
+plt.bar(np.arange(object_count), shapes_type_count_values, color=getColors(
+    object_count))
+plt.xticks(np.arange(object_count), shapes_type_count_keys, rotation=90,
+           fontsize=PLOT_LABEL_FONT_SIZE)
 plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
 plt.ylabel('сколько раз видели', fontsize=PLOT_LABEL_FONT_SIZE)
-plt.show()'''
+plt.show()
