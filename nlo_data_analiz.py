@@ -64,7 +64,7 @@ plt.ylabel('Количество наблюдений', fontsize=PLOT_LABEL_FONT
 plt.show()
 '''
 
-'''статистика по времени года'''
+'''статистика по времени года
 MONTH_COUNT = [0,0,0,0,0,0,0,0,0,0,0,0]
 MONTH_LABEL = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
     'Июль', 'Август', 'Сентябрь' ,'Октябрь' ,'Ноябрь' ,'Декабрь']
@@ -77,4 +77,15 @@ plt.xticks(np.arange(12), MONTH_LABEL, rotation=90, fontsize=PLOT_LABEL_FONT_SIZ
 plt.ylabel('частота появлений', fontsize=PLOT_LABEL_FONT_SIZE)
 plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
 plt.title('Частота появления объектов по месяцам', fontsize=PLOT_LABEL_FONT_SIZE)
-plt.show()
+plt.show()'''
+
+'''статистика по форме обьектов НЛО
+shapes_type_count = pd.value_counts(df['shape'].values)
+shapes_type_count_keys, shapes_type_count_values = dict_sort(dict(shapes_type_count))
+object_count = len(shapes_type_count_keys)
+plt.title('типы обьектов', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.bar(np.arange(object_count), shapes_type_count_values, color=getColors(object_count))
+plt.xticks(np.arange(object_count),shapes_type_count_keys,rotation=90,fontsize=PLOT_LABEL_FONT_SIZE)
+plt.yticks(fontsize=PLOT_LABEL_FONT_SIZE)
+plt.ylabel('сколько раз видели', fontsize=PLOT_LABEL_FONT_SIZE)
+plt.show()'''
